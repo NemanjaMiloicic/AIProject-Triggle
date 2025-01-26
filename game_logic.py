@@ -1,3 +1,6 @@
+from xmlrpc.client import boolean
+
+
 def generate_empty_table(table_length):
     table_min_length = 4
     table_max_length = 8
@@ -11,7 +14,7 @@ def generate_empty_table(table_length):
         for j in range(dynamic_column):
             if i < table_length - 1 and j==dynamic_column-1:
                 table[(i,j)] = {"right_flag" : False , "down_left_flag" : False , "down_right_flag" : False
-                                , "right" : None , "down_left" : (i+1 , j) , "down_right" : (i+1,j+1)}
+                                , "right" : None , "down_left" : (i+1 , j) , "down_right" : (i+1,j+1) }
 
             elif i < table_length -1 and j!=dynamic_column-1:
                 table[(i, j)] = {"right_flag": False, "down_left_flag": False, "down_right_flag": False
@@ -162,18 +165,51 @@ def end_game(table_length, blue_triangles, red_triangles, all_possible_moves):
     return message
 
 
-def main() :
-    table_length = 5
-    table = generate_empty_table(table_length)
-    all_possible_moves = find_all_possible_moves(table , table_length)
-    all_possible_moves = play_move(table, table_length, all_possible_moves, (0, 3), (3, 3))
-    all_possible_moves = play_move(table, table_length, all_possible_moves, (3, 3), (6, 0))
+def check_triangles(table,  formed_triangles):
+    new_triangles = 0
     for key, value in table.items():
-        print(f"{key}: {value}")
+        if value["down_left"] and value["down_right"]:
+            # Kombinacija 1: current -> down_left, current -> down_right, down_left -> right
+            triangle_1 = {key, value["down_left"], value["down_right"]}
+            if (
+                table[key]["down_right_flag"]
+                and table[key]["down_left_flag"]
+                and table[value["down_left"]]["right_flag"]
+            ):
 
-    print(all_possible_moves)
-    minimum_triangles = minimum_triangles_for_win(table_length)
-    print(minimum_triangles)
-    message = end_game(table_length , 23,48, all_possible_moves)
+                if triangle_1 not in formed_triangles:
+                    formed_triangles.append(triangle_1)
+                    new_triangles+=1
+
+            # Kombinacija 2: current -> down_right, current -> right, right -> down_left
+            triangle_2 = {key, value["down_right"], value["right"]}
+            if (
+                table[key]["down_right_flag"]
+                and table[key]["right_flag"]
+                and table[value["right"]]["down_left_flag"]
+            ):
+                if triangle_2 not in formed_triangles:
+                    formed_triangles.append(triangle_2)
+                    new_triangles += 1
+
+    return formed_triangles, new_triangles
+
+def main() :
+    table_length = 4
+    table = generate_empty_table(table_length)
+    formed_triangles = []
+    all_possible_moves = find_all_possible_moves(table, table_length)
+    for i in range(10):
+        start_move = eval(input("Unesite prvi tuple (npr. (1, 2)): "))
+        end_move = eval(input("Unesite drugi tuple (npr. (3, 4)): "))
+        all_possible_moves = play_move(table, table_length, all_possible_moves, start_move, end_move)
+        formed_triangles , new_triangles = check_triangles(table , formed_triangles)
+        print(f'triangles:{formed_triangles} , number of newly formed triangles:{new_triangles}')
+
+    #print(all_possible_moves)
+    #minimum_triangles = minimum_triangles_for_win(table_length)
+    #print(minimum_triangles)
+    #message = end_game(table_length , 0,0, all_possible_moves)
+    #print(formed_triangles)
 
 main()
