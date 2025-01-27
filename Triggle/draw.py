@@ -82,10 +82,7 @@ def draw_circle_pattern(screen, circle_radius, circle_color, rows):
             circle_coordinates = (i, j)
             circles.append((circle_center, circle_coordinates))  # (pozicija, labela , koordinata tuple)
 
-            # Ispis labele pored kruga
-            font = pygame.font.SysFont(None, 24)
-            label_text = font.render(circle_label, True, (0, 0, 0))
-            screen.blit(label_text, (circle_center[0] + circle_radius + 5, circle_center[1] - 10))
+
 
     return circles
 
