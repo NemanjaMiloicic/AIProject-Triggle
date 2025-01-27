@@ -10,16 +10,16 @@ def main_screen():
     image = pygame.image.load("Pozadina.png").convert()
     scaled_image = pygame.transform.scale(image, (const.screen.get_width(), const.screen.get_height()))
 
-    # Kreiraj font objekat
+
     font = pygame.font.Font(None, 36)
 
     while running:
         const.screen.blit(scaled_image, (0, 0))  # Ponovo pozivamo da popunimo pozadinu
 
-        # Crtanje naslova
+
         draw.draw_title(const.screen, const.black, "TRIGGLE")
 
-        # Crtanje dugmadi
+
         single_player_button = pygame.Rect(const.button_x, const.button_y, const.button_width, const.button_height)
         draw.draw_button(const.screen, const.blue, single_player_button, "Single-player", font, const.black)
 

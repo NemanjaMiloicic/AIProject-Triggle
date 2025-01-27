@@ -2,8 +2,9 @@ import pygame
 import const
 import draw
 import main_screen
-import singleplayer
 import game_logic
+import singleplayer
+import copy
 
 # Postavke redova
 rows = []  # Možete menjati ovu vrednost
@@ -19,28 +20,29 @@ def game(player):
     pause_button_clicked = False
     new_button = False
     paused = False
-    move = False
-    current_player = player
-    current_player_text = "Computer" if not player else "Player"  # Tekst trenutnog igraca
-    occupied_positions = []
     table_length = singleplayer.number
     table, table_length = game_logic.generate_empty_table(table_length)
     rows = game_logic.columns(table_length)
     formed_triangles = []
+    previously_formed_triangles = []
     all_possible_moves = game_logic.find_all_possible_moves(table, table_length)
-
+    first_paint = True
+    blue_triangles = 0
+    red_triangles = 0
     while running:
-        const.screen.fill((255, 255, 255))
-        circles = draw.draw_circle_pattern(const.screen, const.circle_radius, const.circle_color, rows)
-        # Nacrtaj sve linije koje su ranije zabeležene
-        # for line in lines:
-        #     pygame.draw.line(const.screen, const.line_color, line[0], line[1], const.line_thickness)
-        draw.draw_lines(const.screen, lines, const.line_color, const.line_thickness)
-        draw.drawPlayerText(const.screen, const.black, current_player_text, player)
+        if first_paint:
+            const.screen.fill((255, 255, 255))
+            circles = draw.draw_circle_pattern(const.screen, const.circle_radius, const.circle_color, rows)
 
-        # Provera da li su dve tačke selektovane
+
+            first_paint = False
+        draw.draw_lines(const.screen, lines, const.line_color, const.line_thickness)
+
+        draw.drawPlayerComputerText(const.screen,  red_triangles, blue_triangles,  player)
+
+
         if len(selected_points) == 2:
-            # Dodaj liniju u listu i resetuj selekciju
+
             all_possible_moves, played = game_logic.play_move(table, table_length, all_possible_moves,
                                                               selected_points[0][1], selected_points[1][1])
             if played:
@@ -48,10 +50,32 @@ def game(player):
                 lines.append((selected_points[0][0], selected_points[1][0]))  # Koristimo samo koordinate
                 print(f"Linija nacrtana izmedju: {selected_points[0][1]} i {selected_points[1][1]}")  # Ispis labele
 
+                if player :
+                    red_triangles+= new_triangles
+                else:
+                    blue_triangles+= new_triangles
+                print(f'blue:{blue_triangles}')
+                print(f'red:{red_triangles}')
+
+
+                if new_triangles > 0:
+
+                    difference = [item for item in formed_triangles if item not in previously_formed_triangles]
+
+                    previously_formed_triangles = copy.copy(formed_triangles)
+                    print(difference)
+                    for i in difference:
+                        draw.draw_triangles_from_difference(const.screen, difference , circles , player)
+
+                        previously_formed_triangles = copy.copy(formed_triangles)
+
+
                 player = not player
-                current_player_text = "Computer" if not player else "Player"
-                # if logic.kraj_igre(lista_poteza , lista_odigranih_poteza , 0 , 0 ):
-                # running = False
+                message = game_logic.end_game(table_length, blue_triangles, red_triangles, all_possible_moves)
+                if message != 'Continue the game!':
+                    running = False
+
+
             selected_points = []
 
         font = pygame.font.Font(None, 36)
@@ -88,10 +112,10 @@ def game(player):
                 if mouse_click[0]:
                     running = False
                     pause_button_clicked = False
-                    lines = []  # Prazni sve linije
-                    selected_points = []  # Resetuje selektovane tacke
-                    new_button = False  # Resetuje stanje za novi meni
-                    paused = False  # Igra nije pauzirana
+                    lines = []
+                    selected_points = []
+                    new_button = False
+                    paused = False
                     const.screen = pygame.display.set_mode((1280, 720))
                     main_screen.main_screen()
 
@@ -105,19 +129,6 @@ def game(player):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 selected_points = draw.handle_mouse_click(circles, mouse_pos, selected_points)
-            # elif event.type == pygame.MOUSEBUTTONDOWN:
-            #             mouse_x, mouse_y = pygame.mouse.get_pos()
-
-            #             # Prolazimo kroz sve tacke (krugove) i proveravamo da li je kliknuta neka tacka
-            #             for circle_center, label in circles:
-            #                 cx, cy = circle_center
-            #                 if (mouse_x - cx) ** 2 + (mouse_y - cy) ** 2 <= const.circle_radius ** 2:
-            #                     # Ako je tacka kliknuta, dodaj je u listu selektovanih
-            #                     if len(selected_points) < 2:
-            #                         selected_points.append((circle_center, label))
-            #                     elif len(selected_points) == 2:
-            #                         # Ako su vec selektovane dve tacke, resetuj selekciju
-            #                         selected_points = [(circle_center, label)]
         pygame.display.flip()
     pygame.quit()
     exit()

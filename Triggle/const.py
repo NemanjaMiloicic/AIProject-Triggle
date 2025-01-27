@@ -5,7 +5,7 @@ screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 pygame.display.set_caption('Triggle')
 
-# Boje
+
 white = (255, 255, 255)
 blue = (0, 0, 200)
 red = (255, 0, 0)
@@ -18,6 +18,6 @@ button_x = (screen.get_width()-350)//2
 button_y = (screen.get_height()-70)//2.5
 
 circle_radius = 17
-circle_color = (255, 0, 0)  # Crvena boja
-line_color = (0, 0, 255)  # Plava boja linije
-line_thickness = 3  # Debljina linije
+circle_color = (255, 0, 0)
+line_color = (0, 255, 40)
+line_thickness = 3

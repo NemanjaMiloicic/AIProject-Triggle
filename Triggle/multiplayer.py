@@ -15,7 +15,7 @@ def multiplayer_screen():
     button_clicked2 = False
     clicked_up = False
     clicked_down = False
-    global number, n  # Velicina table
+    global number
     selected = False
     player = False  # Ako je false, igra igrac 2 prvi, ako je true, igra igrac 1 prvi
 
