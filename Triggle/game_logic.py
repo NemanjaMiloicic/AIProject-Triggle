@@ -104,7 +104,7 @@ def play_move(table , table_length,  all_possible_moves , start_move , end_move)
     move = [start_move , end_move]
     if move not in all_possible_moves:
         print('Invalid move')
-        return all_possible_moves
+        return all_possible_moves , False
     if start_move[0] == end_move[0]:
         current_pillar = start_move
         for i in range(3):
@@ -130,7 +130,7 @@ def play_move(table , table_length,  all_possible_moves , start_move , end_move)
 
     all_possible_moves = []
     all_possible_moves = find_all_possible_moves(table, table_length)
-    return all_possible_moves
+    return all_possible_moves , True
 
 
 def minimum_triangles_for_win(table_length):
@@ -192,6 +192,32 @@ def check_triangles(table,  formed_triangles):
 
     return formed_triangles, new_triangles
 
+def columns(table_length):
+    table_min_length = 4
+    table_max_length = 8
+    if table_length < table_min_length or table_length > table_max_length:
+        return []
+    max_row_elements = (table_length-1)*2+1
+    start_row = table_length
+    row = start_row
+    columns_list = []
+    reached_max = False
+    reached_end = False
+    while not reached_end:
+        columns_list.append(row)
+        if row < max_row_elements and reached_max == False:
+            row+=1
+        elif row == max_row_elements and reached_max == False:
+            row-=1
+            reached_max = True
+        elif row < max_row_elements and row != start_row and reached_max == True:
+            row-=1
+        else:
+            reached_end = True
+    return columns_list
+
+
+
 def main() :
     table_length = 4
     table , table_length = generate_empty_table(table_length)
@@ -205,4 +231,3 @@ def main() :
     print(minimum_triangles_for_win(table_length))
 
 
-main()
