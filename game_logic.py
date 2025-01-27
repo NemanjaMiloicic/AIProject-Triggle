@@ -1,12 +1,9 @@
-from xmlrpc.client import boolean
-
 
 def generate_empty_table(table_length):
     table_min_length = 4
     table_max_length = 8
     if table_length < table_min_length or table_length > table_max_length:
-        print('Table size is not valid')
-        return
+        table_length = 4
     max_row_elements = (table_length-1)*2+1
     table = {}
     dynamic_column = table_length
@@ -45,7 +42,7 @@ def generate_empty_table(table_length):
             dynamic_column -= 1
         else:
             dynamic_column += 1
-    return table
+    return table, table_length
 
 def find_all_possible_moves(table , table_length ):
     all_possible_moves = []
@@ -116,6 +113,8 @@ def play_move(table , table_length,  all_possible_moves , start_move , end_move)
     else:
         current_pillar = start_move
         for i in range(3):
+            if table[current_pillar]["down_left"] is None:
+                break
             current_pillar = table[current_pillar]["down_left"]
 
         if current_pillar == end_move:
@@ -144,10 +143,10 @@ def minimum_triangles_for_win(table_length):
 
 def end_game(table_length, blue_triangles, red_triangles, all_possible_moves):
     minimum_triangles = minimum_triangles_for_win(table_length)
-    if blue_triangles >= minimum_triangles:
+    if blue_triangles > minimum_triangles:
         print('Blue wins!')
         message = "Blue wins!"
-    elif red_triangles >= minimum_triangles:
+    elif red_triangles > minimum_triangles:
         print('Red wins!')
         message = "Red wins!"
     elif not all_possible_moves and blue_triangles > red_triangles:
@@ -168,7 +167,6 @@ def end_game(table_length, blue_triangles, red_triangles, all_possible_moves):
 def check_triangles(table,  formed_triangles):
     new_triangles = 0
     for key, value in table.items():
-        if value["down_left"] and value["down_right"]:
             # Kombinacija 1: current -> down_left, current -> down_right, down_left -> right
             triangle_1 = {key, value["down_left"], value["down_right"]}
             if (
@@ -196,20 +194,15 @@ def check_triangles(table,  formed_triangles):
 
 def main() :
     table_length = 4
-    table = generate_empty_table(table_length)
+    table , table_length = generate_empty_table(table_length)
     formed_triangles = []
     all_possible_moves = find_all_possible_moves(table, table_length)
-    for i in range(10):
-        start_move = eval(input("Unesite prvi tuple (npr. (1, 2)): "))
-        end_move = eval(input("Unesite drugi tuple (npr. (3, 4)): "))
-        all_possible_moves = play_move(table, table_length, all_possible_moves, start_move, end_move)
+    for i in range(len(all_possible_moves)):
+        all_possible_moves = play_move(table, table_length, all_possible_moves, all_possible_moves[0][0], all_possible_moves[0][1])
         formed_triangles , new_triangles = check_triangles(table , formed_triangles)
         print(f'triangles:{formed_triangles} , number of newly formed triangles:{new_triangles}')
+    print(len(formed_triangles))
+    print(minimum_triangles_for_win(table_length))
 
-    #print(all_possible_moves)
-    #minimum_triangles = minimum_triangles_for_win(table_length)
-    #print(minimum_triangles)
-    #message = end_game(table_length , 0,0, all_possible_moves)
-    #print(formed_triangles)
 
 main()
