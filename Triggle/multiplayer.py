@@ -2,7 +2,6 @@ import pygame
 import draw
 import const
 import game
-import game_logic
 
 number = 4
 

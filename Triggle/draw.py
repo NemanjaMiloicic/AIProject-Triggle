@@ -98,7 +98,7 @@ def handle_mouse_click(circles, mouse_pos, selected_points):
             elif len(selected_points) == 2:
                 # Ako su već selektovane dve tačke, resetuj selekciju
                 selected_points = [(circle_center, label)]
-            break  # Prekidamo petlju nakon što nađemo prvu selektovanu tačku
+            break
     return selected_points
 
 
@@ -109,10 +109,10 @@ def draw_lines(screen, lines, line_color, line_thickness):
 
 
 
-# Funkcija za crtanje trouglova iz razlike sa smanjenjem veličine i bojenjem na osnovu player-a
+
 def draw_triangles_from_difference(screen, difference, circles, player):
     for triangle_set in difference:
-        # Za svaku trojku u difference uzimamo fizičke koordinate
+
         triangle_points = []
         for item in triangle_set:
             # Tražimo fizičku lokaciju tačke u 'circles' na osnovu indeksa
@@ -154,4 +154,10 @@ def draw_triangle(screen, points, player):
     else:
         pygame.draw.polygon(screen, (0, 0, 255), points)
 
+def draw_winning_message(message):
+    font = pygame.font.Font(None, 48)
+    text_surface = font.render(message, True, (255, 0, 0))
+    text_rect = text_surface.get_rect(
+        topleft=(10, const.screen.get_height() - text_surface.get_height()-20))
+    const.screen.blit(text_surface, text_rect)
 

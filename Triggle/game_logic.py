@@ -53,7 +53,6 @@ def find_all_possible_moves(table , table_length ):
         print('Table size is not valid')
         return
 
-
     max_row_elements = (table_length - 1) * 2 + 1
     dynamic_column = table_length
     for i in range(max_row_elements):
@@ -141,25 +140,23 @@ def minimum_triangles_for_win(table_length):
             triangle_row+=2
         return minimum_triangles
 
-def end_game(table_length, blue_triangles, red_triangles, all_possible_moves):
-    minimum_triangles = minimum_triangles_for_win(table_length)
+def end_game(blue_triangles, red_triangles, all_possible_moves , minimum_triangles):
+
     if blue_triangles > minimum_triangles:
-        print('Blue wins!')
+
         message = "Blue wins!"
     elif red_triangles > minimum_triangles:
-        print('Red wins!')
+
         message = "Red wins!"
     elif not all_possible_moves and blue_triangles > red_triangles:
-        print('Blue wins!')
+
         message = "Blue wins!"
     elif not all_possible_moves and red_triangles > blue_triangles:
-        print('Red wins!')
+
         message = "Red wins!"
     elif not all_possible_moves and red_triangles == blue_triangles:
-        print('It is a tie!')
         message = "It is a tie!"
     else:
-        print('Continue the game!')
         message = "Continue the game!"
     return message
 
