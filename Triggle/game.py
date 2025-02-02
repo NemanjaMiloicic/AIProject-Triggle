@@ -48,6 +48,7 @@ def game(player):
                 formed_triangles, new_triangles = game_logic.check_triangles(table, formed_triangles)
                 lines.append((selected_points[0][0], selected_points[1][0]))  # Koristimo samo koordinate
 
+
                 if player:
                     red_triangles += new_triangles
                 else:
@@ -63,8 +64,7 @@ def game(player):
                 if message != 'Continue the game!':
                     draw.draw_winning_message(message)
                     #running = False
-            else:
-                print(f"{selected_points[0][1]} and {selected_points[1][1]}")
+
             selected_points = []
 
 

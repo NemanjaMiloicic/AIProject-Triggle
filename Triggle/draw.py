@@ -73,14 +73,13 @@ def draw_circle_pattern(screen, circle_radius, circle_color, rows):
 
     for i, num_circles in enumerate(rows):
         x_offset = (screen.get_width() - num_circles * horizontal_spacing) // 2
-        row_label = 0
         for j in range(num_circles):
             circle_center = (int(x_offset + j * horizontal_spacing), int(i * vertical_spacing + circle_radius))
             pygame.draw.circle(screen, circle_color, circle_center, circle_radius)
 
-            circle_label = f"{i}{j}"
             circle_coordinates = (i, j)
-            circles.append((circle_center, circle_coordinates))  # (pozicija, labela , koordinata tuple)
+            circles.append((circle_center, circle_coordinates))  # (pozicija,  koordinata tuple)
+
 
 
 

@@ -89,7 +89,7 @@ def multiplayer_screen():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if player:
                         player = False
-                        draw.ret_player(player)
+
 
         if novo_dugme2:
             board_increment_button = pygame.Rect(const.button_x + 480, const.button_y + 125, const.button_width - 250,

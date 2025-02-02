@@ -1,3 +1,5 @@
+import time
+
 import pygame
 import const
 import draw
@@ -38,44 +40,79 @@ def game(player):
             first_paint = False
         draw.draw_lines(const.screen, lines, const.line_color, const.line_thickness)
 
+
         draw.drawPlayerComputerText(const.screen,  red_triangles, blue_triangles,  player)
 
 
-        if len(selected_points) == 2:
+        if player :
 
-            all_possible_moves, played = game_logic.play_move(table, table_length, all_possible_moves,
-                                                              selected_points[0][1], selected_points[1][1])
-            if played:
-                formed_triangles, new_triangles = game_logic.check_triangles(table, formed_triangles)
-                lines.append((selected_points[0][0], selected_points[1][0]))  # Koristimo samo koordinate
+            if len(selected_points) == 2:
 
-                if player :
+                all_possible_moves, played = game_logic.play_move(table, table_length, all_possible_moves,
+                                                                  selected_points[0][1], selected_points[1][1])
+                if played:
+                    formed_triangles, new_triangles = game_logic.check_triangles(table, formed_triangles)
+                    lines.append((selected_points[0][0], selected_points[1][0]))  # Koristimo samo koordinate
                     red_triangles+= new_triangles
-                else:
-                    blue_triangles+= new_triangles
 
 
 
-                if new_triangles > 0:
 
-                    difference = [item for item in formed_triangles if item not in previously_formed_triangles]
+                    if new_triangles > 0:
 
-                    previously_formed_triangles = copy.copy(formed_triangles)
-
-                    for i in difference:
-                        draw.draw_triangles_from_difference(const.screen, difference , circles , player)
+                        difference = [item for item in formed_triangles if item not in previously_formed_triangles]
 
                         previously_formed_triangles = copy.copy(formed_triangles)
 
-                player = not player
-                message = game_logic.end_game(blue_triangles, red_triangles, all_possible_moves , minimum_triangles)
-                if message != 'Continue the game!':
-                    draw.draw_winning_message(message)
-                    # running = False
-            else:
-                print(f"{selected_points[0][1]} and {selected_points[1][1]}")
+                        for i in difference:
+                            draw.draw_triangles_from_difference(const.screen, difference , circles , player)
 
-            selected_points = []
+                            previously_formed_triangles = copy.copy(formed_triangles)
+
+                    player = not player
+                    message = game_logic.end_game(blue_triangles, red_triangles, all_possible_moves , minimum_triangles)
+                    if message != 'Continue the game!':
+                        draw.draw_winning_message(message)
+                        # running = False
+                else:
+                    print(f"{selected_points[0][1]} and {selected_points[1][1]}")
+
+                selected_points = []
+
+        else:
+
+            depth = 3
+            best_move = game_logic.minimax(table, table_length , all_possible_moves , formed_triangles , depth)
+
+            if best_move is not None:
+
+
+                all_possible_moves, played = game_logic.play_move(table, table_length, all_possible_moves , best_move[0] , best_move[1])
+
+
+                if played :
+                    formed_triangles, new_triangles = game_logic.check_triangles(table, formed_triangles)
+                    physical_start_best_move , physical_end_best_move = game_logic.find_circles(circles, best_move[0] , best_move[1])
+                    lines.append((physical_start_best_move, physical_end_best_move))
+                    blue_triangles += new_triangles
+
+
+            if new_triangles > 0:
+
+                difference = [item for item in formed_triangles if item not in previously_formed_triangles]
+
+                previously_formed_triangles = copy.copy(formed_triangles)
+
+                for i in difference:
+                    draw.draw_triangles_from_difference(const.screen, difference, circles, player)
+
+                    previously_formed_triangles = copy.copy(formed_triangles)
+
+            player = not player
+            message = game_logic.end_game(blue_triangles, red_triangles, all_possible_moves, minimum_triangles)
+            if message != 'Continue the game!':
+                draw.draw_winning_message(message)
+
 
         font = pygame.font.Font(None, 36)
         quit_game_button = pygame.Rect(const.screen.get_width() - 200, 20, 150, 50)

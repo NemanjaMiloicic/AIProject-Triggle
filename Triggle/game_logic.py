@@ -1,3 +1,4 @@
+import copy
 
 def generate_empty_table(table_length):
     table_min_length = 4
@@ -101,9 +102,10 @@ def find_all_possible_moves(table , table_length ):
 
 def play_move(table , table_length,  all_possible_moves , start_move , end_move):
     move = [start_move , end_move]
+
     if move not in all_possible_moves:
-        print('Invalid move')
         return all_possible_moves , False
+
     if start_move[0] == end_move[0]:
         current_pillar = start_move
         for i in range(3):
@@ -127,9 +129,8 @@ def play_move(table , table_length,  all_possible_moves , start_move , end_move)
                 table[current_pillar]["down_right_flag"] = True
                 current_pillar = table[current_pillar]["down_right"]
 
-    all_possible_moves = []
-    all_possible_moves = find_all_possible_moves(table, table_length)
-    return all_possible_moves , True
+    new_possible_moves = find_all_possible_moves(table, table_length)
+    return new_possible_moves , True
 
 
 def minimum_triangles_for_win(table_length):
@@ -214,17 +215,106 @@ def columns(table_length):
     return columns_list
 
 
+def minimax(table , table_length , all_possible_moves, formed_triangles , depth):
+    max_grade, best_move = max_func(table, table_length, all_possible_moves,
+                                    formed_triangles, depth, 0)
+
+    return best_move
+
+
+def max_func(table, table_length, all_possible_moves, formed_triangles, depth, triangles=0):
+    if depth == 0 or not all_possible_moves:
+        return triangles, None
+
+    best_move = None
+    max_grade = float('-inf')
+
+    for move in all_possible_moves:
+        previous_table = copy.deepcopy(table)
+        previous_triangles = formed_triangles.copy()
+
+
+        new_possible_moves, valid = play_move(previous_table, table_length, all_possible_moves, move[0], move[1])
+
+        if not valid:
+            continue
+
+        new_formed_triangles, new_triangles = check_triangles(previous_table, previous_triangles)
+
+        grade, _ = min_func(previous_table, table_length, new_possible_moves, new_formed_triangles, depth - 1,
+                            triangles + new_triangles)
+
+        if grade > max_grade:
+            max_grade = grade
+            best_move = move
+
+
+        table = previous_table
+        formed_triangles = previous_triangles
+
+    return max_grade, best_move
+
+
+
+def min_func(table, table_length, all_possible_moves, formed_triangles, depth, triangles=0):
+    if depth == 0 or not all_possible_moves:
+        return triangles, None
+
+    best_move = None
+    min_grade = float('inf')
+
+    for move in all_possible_moves:
+        previous_table = copy.deepcopy(table)
+        previous_triangles = formed_triangles.copy()
+
+
+        new_possible_moves, valid = play_move(previous_table, table_length, all_possible_moves, move[0], move[1])
+
+        if not valid:
+            continue
+
+        new_formed_triangles, new_triangles = check_triangles(previous_table, previous_triangles)
+
+        grade, _ = max_func(previous_table, table_length, new_possible_moves, new_formed_triangles, depth - 1,
+                            triangles + new_triangles)
+
+        if grade < min_grade:
+            min_grade = grade
+            best_move = move
+
+
+        table = previous_table
+        formed_triangles = previous_triangles
+
+    return min_grade, best_move
+
+
+
+def find_circles(circles, start_move, end_move):
+    start_coords = None
+    end_coords = None
+
+    for physical_coordinates, label in circles:
+        if label == start_move:
+            start_coords = physical_coordinates
+        if label == end_move:
+            end_coords = physical_coordinates
+
+        if start_coords and end_coords:
+            break
+
+    return start_coords, end_coords
+
 
 def main() :
     table_length = 4
     table , table_length = generate_empty_table(table_length)
-    formed_triangles = []
     all_possible_moves = find_all_possible_moves(table, table_length)
-    for i in range(len(all_possible_moves)):
-        all_possible_moves = play_move(table, table_length, all_possible_moves, all_possible_moves[0][0], all_possible_moves[0][1])
-        formed_triangles , new_triangles = check_triangles(table , formed_triangles)
-        print(f'triangles:{formed_triangles} , number of newly formed triangles:{new_triangles}')
-    print(len(formed_triangles))
-    print(minimum_triangles_for_win(table_length))
+    all_possible_moves, valid = play_move(table, table_length, all_possible_moves, (3,3),(6,3))
+    play_move(table, table_length, all_possible_moves, (3, 3), (3, 6))
+
+
+
+
 
 
